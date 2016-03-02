@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Craps Simulation
+PROJECTNAME=Chap3_Prob13
 
 # Active Configuration
 DEFAULTCONF=Debug
