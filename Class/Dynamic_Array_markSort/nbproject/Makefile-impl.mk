@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=modeFunction
+PROJECTNAME=Dynamic_Array_markSort
 
 # Active Configuration
 DEFAULTCONF=Debug

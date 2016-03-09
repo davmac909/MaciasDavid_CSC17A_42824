@@ -13,6 +13,21 @@ int *mode(int *, int);
 //Execution Begins Here
 int main(int argc, short** argv) {
     //Declare and initialize variables
+    
+    //Input Data
+   
+    //Map inputs to outputs
+    
+    //Output the results
+    mode(point, arySize);
+    
+    //Exit stage right
+    delete[] point;
+    return 0;
+}
+
+int *mode(int *, int){
+    //Declare and initialize variables
     int arySize;
     int *point;
     
@@ -29,15 +44,4 @@ int main(int argc, short** argv) {
                                      i+1==3?"rd":"th") <<" number." <<endl;
         cin >>*(point+i);
     }
-    
-    //Output the results
-    mode(point, arySize);
-    
-    //Exit stage right
-    delete[] point;
-    return 0;
-}
-
-int *mode(int *, int){
-    
 }
