@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=Cygwin_1-Windows
 CND_ARTIFACT_DIR_Debug=dist/Debug/Cygwin_1-Windows
-CND_ARTIFACT_NAME_Debug=craps_simulation
-CND_ARTIFACT_PATH_Debug=dist/Debug/Cygwin_1-Windows/craps_simulation
+CND_ARTIFACT_NAME_Debug=chap4_prob10
+CND_ARTIFACT_PATH_Debug=dist/Debug/Cygwin_1-Windows/chap4_prob10
 CND_PACKAGE_DIR_Debug=dist/Debug/Cygwin_1-Windows/package
-CND_PACKAGE_NAME_Debug=crapssimulation.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/Cygwin_1-Windows/package/crapssimulation.tar
+CND_PACKAGE_NAME_Debug=chap4prob10.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/Cygwin_1-Windows/package/chap4prob10.tar
 # Release configuration
 CND_PLATFORM_Release=Cygwin_1-Windows
 CND_ARTIFACT_DIR_Release=dist/Release/Cygwin_1-Windows
-CND_ARTIFACT_NAME_Release=craps_simulation
-CND_ARTIFACT_PATH_Release=dist/Release/Cygwin_1-Windows/craps_simulation
+CND_ARTIFACT_NAME_Release=chap4_prob10
+CND_ARTIFACT_PATH_Release=dist/Release/Cygwin_1-Windows/chap4_prob10
 CND_PACKAGE_DIR_Release=dist/Release/Cygwin_1-Windows/package
-CND_PACKAGE_NAME_Release=crapssimulation.tar
-CND_PACKAGE_PATH_Release=dist/Release/Cygwin_1-Windows/package/crapssimulation.tar
+CND_PACKAGE_NAME_Release=chap4prob10.tar
+CND_PACKAGE_PATH_Release=dist/Release/Cygwin_1-Windows/package/chap4prob10.tar
 #
 # include compiler specific variables
 #
