@@ -17,6 +17,8 @@ void markSrt(int *, int *, int);
 int *fllMod(int, int);
 int *mode(int *, int);
 void prntMod(int *, int);
+float median(int *, int *, int);
+float mean(int *, int *, int);
 
 //Execution Begins Here
 int main(int argc, char** argv) {
@@ -24,23 +26,33 @@ int main(int argc, char** argv) {
     srand(static_cast<int>(time(0)));
     
     //Declare and initialize variables
-    int size = 100;
+    int size = 6;
     int *array = fllArry(size);
     int *index = fllIndx(size);
+    float med, mn;
     
     //int *modeAry = fllMod(size, 10);
     
     //Output the results
+    cout <<"Unsorted array:" <<endl;
     prntAry(array, index, size, 10);
     
     //Sort Array
     markSrt(array, index, size);
     
+    //Find the Median and Mean
+    med = median(array, index, size);
+    mn = mean(array, index, size);
+    
     //Output the results
+    cout <<"Sorted array:" <<endl;
     prntAry(array, index, size, 10);
+    cout <<"Median = " <<med <<endl;
+    cout <<"Mean   = " <<mn <<endl;
     
     //Deallocate Memory
     delete []array;
+    delete []index;
     
     //Exit stage right
     return 0;
@@ -101,13 +113,13 @@ int *fllMod(int n, int mod){
 //  perLine-> number of numbers to display per row
 void prntAry(int *a, int *b, int n, int perLine){
     //Output the Array
-    cout <<endl;
     for(int i = 0; i < n; i++){
         cout <<a[b[i]] <<" ";
         if(i%perLine == (perLine-1)){
             cout <<endl;
         }
     }
+    cout <<endl;
 }
 
 /******************************************************************************/
@@ -128,4 +140,22 @@ void markSrt(int *a, int *indx, int n){
             }
         }
     }
+}
+
+float median(int *a, int *b, int n){
+    float median;
+    if(n%2 == 0){
+        median = (*(a+*(b+(n/2)))+*(a+*(b+((n/2)-1))))*1.0f/2;
+    }else{
+        median = *(a+*(b+(n/2)));
+    }
+    return median;
+}
+
+float mean(int *a, int *b, int n){
+    int sum = 0;
+    for(int i = 0; i < n; i++){
+        sum = *(a+*(b+i))+sum;
+    }
+    return (sum*1.0f/n);
 }
