@@ -15,7 +15,7 @@ int *fllIndx(int);
 void prntAry(int *, int *, int, int);
 void markSrt(int *, int *, int);
 int *fllMod(int, int);
-int *mode(int *, int);
+int *mode(int *, int *, int);
 void prntMod(int *, int);
 float median(int *, int *, int);
 float mean(int *, int *, int);
@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
     int size = 6;
     int *array = fllArry(size);
     int *index = fllIndx(size);
+    
     float med, mn;
     
     //int *modeAry = fllMod(size, 10);
@@ -43,16 +44,20 @@ int main(int argc, char** argv) {
     //Find the Median and Mean
     med = median(array, index, size);
     mn = mean(array, index, size);
+    int *mod = mode(array, index, size);
     
     //Output the results
     cout <<"Sorted array:" <<endl;
     prntAry(array, index, size, 10);
     cout <<"Median = " <<med <<endl;
     cout <<"Mean   = " <<mn <<endl;
+    cout <<"Mode array = " <<endl;
+    
     
     //Deallocate Memory
     delete []array;
     delete []index;
+    delete []mod;
     
     //Exit stage right
     return 0;
@@ -158,4 +163,34 @@ float mean(int *a, int *b, int n){
         sum = *(a+*(b+i))+sum;
     }
     return (sum*1.0f/n);
+}
+
+int *mode(int *ary, int *indx, int n){
+    int *a = new int[n];
+    int count = 1;
+    int modNum = 1;
+    int maxFreq = 0;
+    int numMods = 0;
+    for(int i = 0; i < n; i++){
+        if(*(ary+*(indx+i)) == *(ary+*(indx+(i+1)))){
+            count++;
+            if(count > maxFreq){
+                a[modNum-1] == *(ary+*(indx+i));
+                *(a+1) = maxFreq;
+            }else if(count == maxFreq){
+                modNum++;
+                a[modNum] == *(ary+*(indx+i));
+                *(a+1) = maxFreq;
+            }
+        }else{
+            count = 1;
+        }
+    }
+    for(int j = 2; j<n; j++){
+        if(*(a+j) > 0){
+            numMods++;
+        } 
+    }
+    *(a+0) = numMods;
+    return a;
 }
