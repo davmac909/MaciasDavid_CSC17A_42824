@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=modeFunction
+PROJECTNAME=name_sorting_files
 
 # Active Configuration
 DEFAULTCONF=Debug
