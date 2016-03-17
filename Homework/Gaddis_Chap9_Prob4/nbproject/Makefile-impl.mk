@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Dynamic_Array_markSort
+PROJECTNAME=Gaddis_Chap9_Prob4
 
 # Active Configuration
 DEFAULTCONF=Debug
