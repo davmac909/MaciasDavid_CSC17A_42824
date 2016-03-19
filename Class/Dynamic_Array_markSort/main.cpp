@@ -15,10 +15,11 @@ int *fllIndx(int);
 void prntAry(int *, int *, int, int);
 void markSrt(int *, int *, int);
 int *fllMod(int, int);
-int *mode(int *, int *, int);
-void prntMod(int *, int);
+void mode(int *, int *, int);
+//void prntMod(int *, int);
 float median(int *, int *, int);
 float mean(int *, int *, int);
+int getMdSz(int *, int *, int, int);
 
 //Execution Begins Here
 int main(int argc, char** argv) {
@@ -26,13 +27,11 @@ int main(int argc, char** argv) {
     srand(static_cast<int>(time(0)));
     
     //Declare and initialize variables
-    int size = 6;
+    int size = 100;
     int *array = fllArry(size);
     int *index = fllIndx(size);
     
     float med, mn;
-    
-    //int *modeAry = fllMod(size, 10);
     
     //Output the results
     cout <<"Unsorted array:" <<endl;
@@ -44,7 +43,6 @@ int main(int argc, char** argv) {
     //Find the Median and Mean
     med = median(array, index, size);
     mn = mean(array, index, size);
-    int *mod = mode(array, index, size);
     
     //Output the results
     cout <<"Sorted array:" <<endl;
@@ -52,12 +50,12 @@ int main(int argc, char** argv) {
     cout <<"Median = " <<med <<endl;
     cout <<"Mean   = " <<mn <<endl;
     cout <<"Mode array = " <<endl;
-    
+    mode(array, index, size);
     
     //Deallocate Memory
     delete []array;
     delete []index;
-    delete []mod;
+    //delete []mod;
     
     //Exit stage right
     return 0;
@@ -160,37 +158,50 @@ float median(int *a, int *b, int n){
 float mean(int *a, int *b, int n){
     int sum = 0;
     for(int i = 0; i < n; i++){
-        sum = *(a+*(b+i))+sum;
+        sum += a[b[i]];
     }
     return (sum*1.0f/n);
 }
 
-int *mode(int *ary, int *indx, int n){
-    int *a = new int[n];
-    int count = 1;
-    int modNum = 1;
-    int maxFreq = 0;
-    int numMods = 0;
+void mode(int *ary, int *indx, int n){
+    int modeSz = 2;
+    int freq = 1;
+    int maxFreq = 1;
+    cout <<"Number  |  Times repeated" <<endl;
     for(int i = 0; i < n; i++){
-        if(*(ary+*(indx+i)) == *(ary+*(indx+(i+1)))){
-            count++;
-            if(count > maxFreq){
-                a[modNum-1] == *(ary+*(indx+i));
-                *(a+1) = maxFreq;
-            }else if(count == maxFreq){
-                modNum++;
-                a[modNum] == *(ary+*(indx+i));
-                *(a+1) = maxFreq;
+        if(freq == 1){
+            cout <<setw(4) <<ary[indx[i]] <<setw(8);
+        }
+         cout <<freq <<" ";
+        if(*(ary+*(indx+i)) == ary[indx[i+1]]){
+            freq++;
+            if(freq > maxFreq){
+                maxFreq = freq;
             }
         }else{
-            count = 1;
+            cout <<endl;
+            freq = 1;
         }
     }
-    for(int j = 2; j<n; j++){
-        if(*(a+j) > 0){
-            numMods++;
-        } 
+    
+    modeSz += getMdSz(ary, indx, n, maxFreq);
+    
+    cout <<"Max Frequency: " <<maxFreq <<endl;
+    cout <<"Mode array size: " <<modeSz <<endl;
+}
+
+int getMdSz(int *ary, int *indx, int n, int maxFreq){
+    int freq = 1;
+    int size = 0;
+    for(int i = 0; i < n; i++){
+        if(*(ary+*(indx+i)) == ary[indx[i+1]]){
+            freq++;
+            if(freq == maxFreq){
+                size++;
+            }
+        }else{
+            freq = 1;
+        }
     }
-    *(a+0) = numMods;
-    return a;
+    return size;
 }
