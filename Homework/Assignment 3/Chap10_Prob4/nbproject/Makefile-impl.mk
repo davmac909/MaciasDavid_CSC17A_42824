@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=mean median mode
+PROJECTNAME=Chap10_Prob4
 
 # Active Configuration
 DEFAULTCONF=Debug
