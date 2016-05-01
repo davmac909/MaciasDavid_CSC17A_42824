@@ -23,11 +23,12 @@ using namespace std;
 //Function Prototypes
 Ship *shpLoc(short);
 Grid *drwGrid(Ship *, short, short);
-void prntScrn(Grid *, Ship *, short, Player *);
-void getInpt(Player *, bool &, bool &);
-void hitMiss(Grid *, Ship *, Player *, short);
-void getIntl(Player *);
-void shwRank(Player *);
+void prntScrn(Grid *, Ship *, short, Player &);
+void getInpt(Player &, bool &, bool &);
+void hitMiss(Grid *, Ship *, Player &, short);
+void getIntl(Player &);
+void shwRank(Player &);
+void gmEnd(Ship *, short , bool &);
 
 //Execution Begins Here
 int main(int argc, char** argv) {
@@ -37,8 +38,7 @@ int main(int argc, char** argv) {
     //Declare and initialize variables
     short nShips = 5;
     short nGrids = 2;
-    short nPlyrs = 1;
-    Player *player = new Player[nPlyrs];
+    Player player;
     Ship *ship = shpLoc(nShips);
     Grid *grid = drwGrid(ship, nShips, nGrids);
     short inRow, inCol;
@@ -50,6 +50,11 @@ int main(int argc, char** argv) {
     do{
         //Print Game Screen
         prntScrn(grid, ship, nShips, player);
+        //Determine game end
+        gmEnd(ship, nShips, gameEnd);
+        if(gameEnd){
+            break;
+        }
         //Get user inputs
         getInpt(player, intl, gameEnd);
         if(gameEnd){
@@ -60,9 +65,11 @@ int main(int argc, char** argv) {
     }while(!gameEnd);
     tEnd = time(0);
     //Calculate Game Time
-    player->time = static_cast<float>(difftime(tEnd, tStrt));
+    player.time = static_cast<short>(difftime(tEnd, tStrt));
+    
     //Get Player's Initials
     getIntl(player);
+     
     //Show Rankings
     shwRank(player);
     
@@ -73,7 +80,6 @@ int main(int argc, char** argv) {
     }
     delete []ship;
     delete []grid;
-    delete []player;
     //Exit stage right
     return 0;
 }
@@ -82,7 +88,24 @@ Ship *shpLoc(short n){
     Ship *a = new Ship[n];
     
     for(int i = 0; i < n; i++){
-        a[i].shipL = rand()%4+2;
+        switch(i){
+            case 0:{
+                a[i].shipL = 5;
+                break;
+            }case 1:{
+                a[i].shipL = 4;
+                break;
+            }case 2:{
+                a[i].shipL = 3;
+                break;
+            }case 3:{
+                a[i].shipL = 3;
+                break;
+            }case 4:{
+                a[i].shipL = 2;
+                break;
+            }
+        }
         a[i].shipLtemp = a[i].shipL;
         a[i].shipX = rand()%(COL-a[i].shipL+1)+1;
         a[i].shipY = rand()%(ROW-a[i].shipL+1)+1;
@@ -149,7 +172,7 @@ Grid *drwGrid(Ship *b, short n, short g){
     return a;
 }
 
-void prntScrn(Grid *a, Ship *s, short n, Player *p){
+void prntScrn(Grid *a, Ship *s, short n, Player &p){
     cout <<"  ";
     for(int i = 65, j = 0; j < COL; j++, i++){
             cout <<" " <<static_cast<char>(i);       //Print Letters for Columns
@@ -171,17 +194,17 @@ void prntScrn(Grid *a, Ship *s, short n, Player *p){
         }if(i == 9){
             cout <<" 'H'-Hit, 'X'-Miss";
         }if(i == 11){
-            cout <<" Bombs Remaining: " <<p->nbombs;
+            cout <<" Bombs Remaining: " <<p.nbombs;
         }if(i == 12){
-            cout <<" Total Hits: " <<p->totHit;
+            cout <<" Total Hits: " <<p.totHit;
         }if(i == 13){
-            cout <<" Total Misses: " <<p->totMiss;
+            cout <<" Total Misses: " <<p.totMiss;
         }
         cout <<endl;
     }
 }
 
-void getInpt(Player *p, bool &i, bool &end){
+void getInpt(Player &p, bool &i, bool &end){
     string in;
     char a,b;
     do{
@@ -190,6 +213,7 @@ void getInpt(Player *p, bool &i, bool &end){
             cout <<"Enter the letter and number you wish to strike " <<endl;
             cout <<"Then 'B' to order a bomb strike if desired." <<endl;
             cout <<"i.e. \"H9\" for a missile or \"H9B\" for a bomb" <<endl;
+            cout <<"Or enter 'Q' to quit the game" <<endl;
             
         }else{
             cout <<"What's your next target?" <<endl;
@@ -197,7 +221,7 @@ void getInpt(Player *p, bool &i, bool &end){
         getline(cin, in);
 
         stringstream ss(in);
-        ss >>a >> p->inRow >>b;
+        ss >>a >> p.inRow >>b;
 
         a = toupper(a);
         b = toupper(b);
@@ -205,15 +229,15 @@ void getInpt(Player *p, bool &i, bool &end){
             end = true;
             break;
         }
-        p->inCol = static_cast<int>(a-65);
-        p->inRow -= 1;
-    }while((p->inCol < 0 || p->inCol > 15) || (p->inRow < 0 || p->inRow > 14));
+        p.inCol = static_cast<int>(a-65);
+        p.inRow -= 1;
+    }while((p.inCol < 0 || p.inCol > 15) || (p.inRow < 0 || p.inRow > 14));
     i = false;
     if(b == 'B'){
         b = ' ';
-        if(!(p->nbombs == 0)){
-            p->bomb = true;
-            p->nbombs--;
+        if(!(p.nbombs == 0)){
+            p.bomb = true;
+            p.nbombs--;
         }else{
             cout <<"You are out of bombs." <<endl;
             cout <<"Missile strike en route" <<endl;
@@ -221,84 +245,94 @@ void getInpt(Player *p, bool &i, bool &end){
     }
 }
 
-void hitMiss(Grid *g, Ship *s, Player *p, short n){
-    if(p->bomb){
-        p->bomb = false;
+void hitMiss(Grid *g, Ship *s, Player &p, short n){
+    if(p.bomb){
+        p.bomb = false;
         for(short i = 0-1; i < 2; i++){
             for(short j = 0-1; j < 2; j++){
-                if(g[1].grid[p->inRow+i][p->inCol+j] == 'O'){
-                    g[1].grid[p->inRow+i][p->inCol+j] = 'H';
-                    g[0].grid[p->inRow+i][p->inCol+j] = 'H';
-                    p->totHit++;
+                if(g[1].grid[p.inRow+i][p.inCol+j] == 'O'){
+                    g[1].grid[p.inRow+i][p.inCol+j] = 'H';
+                    g[0].grid[p.inRow+i][p.inCol+j] = 'H';
+                    p.totHit++;
                     for(int t = 0; t < n; t++){
                         for(int v = 0; v < s[t].shipL; v++){
-                            if((p->inCol+j == s[t].crdnts[v].xLoc) && (p->inRow+i == s[t].crdnts[v].yLoc)){
+                            if((p.inCol+j == s[t].crdnts[v].xLoc) && (p.inRow+i == s[t].crdnts[v].yLoc)){
                                 s[t].shipLtemp--;
                             }
                         }
                     }
-                }else if(g[1].grid[p->inRow+i][p->inCol+j] == '~'){
-                    g[0].grid[p->inRow+i][p->inCol+j] = 'X';
+                }else if(g[1].grid[p.inRow+i][p.inCol+j] == '~'){
+                    g[0].grid[p.inRow+i][p.inCol+j] = 'X';
                 }
             }
         }
-        p->totMiss++;
+        p.totMiss++;
     }else{
-        if(g[1].grid[p->inRow][p->inCol] == 'O'){
-            g[1].grid[p->inRow][p->inCol] = 'H';
-            g[0].grid[p->inRow][p->inCol] = 'H';
-            p->totHit++;
+        if(g[1].grid[p.inRow][p.inCol] == 'O'){
+            g[1].grid[p.inRow][p.inCol] = 'H';
+            g[0].grid[p.inRow][p.inCol] = 'H';
+            p.totHit++;
             for(int t = 0; t < n; t++){
                 for(int v = 0; v < s[t].shipL; v++){
-                    if((p->inCol == s[t].crdnts[v].xLoc) && (p->inRow == s[t].crdnts[v].yLoc)){
+                    if((p.inCol == s[t].crdnts[v].xLoc) && (p.inRow == s[t].crdnts[v].yLoc)){
                         s[t].shipLtemp--;
                     }
                 }
             }
-        }else if(g[1].grid[p->inRow][p->inCol] == '~'){
-            g[0].grid[p->inRow][p->inCol] = 'X';
-            p->totMiss++;
+        }else if(g[1].grid[p.inRow][p.inCol] == '~'){
+            g[0].grid[p.inRow][p.inCol] = 'X';
+            p.totMiss++;
         }
     }
-    p->ratio = p->totHit/(p->totHit+p->totMiss);
+    p.ratio = 1.0f*p.totHit/(p.totHit+p.totMiss);
 }
 
-void getIntl(Player *p){
+void getIntl(Player &p){
     ofstream out;
-    out.open("scores.dat", ios::out | ios::binary | ios::app);
+    out.open("scores.dat",ios::binary | ios::app);
     cout <<"Game End:" <<endl;
-    cout <<" Game Time(sec) - " <<p->time <<endl;
-    cout <<" Bombs Remaining - " <<p->nbombs <<endl;
-    cout <<" Hits - " <<p->totHit <<endl;
-    cout <<" Misses - " <<p->totMiss <<endl;
-    cout <<" Hits per strikes called - " <<p->ratio <<endl;
+    cout <<" Game Time(sec) - " <<p.time <<endl;
+    cout <<" Bombs Remaining - " <<p.nbombs <<endl;
+    cout <<" Hits - " <<p.totHit <<endl;
+    cout <<" Misses - " <<p.totMiss <<endl;
+    cout <<" Hits per strikes called - " <<p.ratio <<endl;
     cout <<" Your Initials: ";
-    cin.getline(p->intls, NSIZE);
+    cin.getline(p.intls, NSIZE);
     
     //Write player information to file in binary
-    out.write(reinterpret_cast<char *>(p), sizeof(p));
+    out.write(reinterpret_cast<char *>(&p), sizeof(p));
+    //Close file
     out.close();
 }
 
-void shwRank(Player *p){
+void shwRank(Player &p){
     ifstream in;
-    in.open("scores.dat", ios::in | ios::binary);
+    in.open("scores.dat",ios::binary);
     if(in){
         //Output file data
         cout <<endl <<endl <<"Rankings" <<endl;
-        in.read(reinterpret_cast<char *>(p), sizeof(p));
+        in.read(reinterpret_cast<char *>(&p), sizeof(p));
         cout <<"Initials | Hit/Total Strikes | Hits | Misses | Bombs Left | Game Time(sec)" <<endl;
         while(!in.eof()){
-            cout <<setw(6) <<p->intls 
-                    <<setw(16) <<showpoint <<setprecision(2) <<p->ratio
-                    <<setw(11) <<p->totHit <<setw(8) <<p->totMiss
-                    <<setw(13) <<p->nbombs <<setw(12) <<p->time <<endl;
-            in.read(reinterpret_cast<char *>(p), sizeof(p));
+            cout <<setw(6) <<p.intls 
+                    <<setw(16) <<showpoint <<setprecision(2) <<p.ratio
+                    <<setw(11) <<p.totHit <<setw(8) <<p.totMiss
+                    <<setw(13) <<p.nbombs <<setw(12) <<p.time <<endl;
+            in.read(reinterpret_cast<char *>(&p), sizeof(p));
         }
     }else{
         cout <<"Error: Couldn't open \"scores.dat\"" <<endl;
     }
-    
     //close file
     in.close();
+}
+
+void gmEnd(Ship *s, short n, bool &b){
+    short temp;
+    for(int i = 0; i < n; i++){
+        temp += s[i].shipLtemp;
+        if(temp == 0){
+            b = true;
+        }
+    }
 }

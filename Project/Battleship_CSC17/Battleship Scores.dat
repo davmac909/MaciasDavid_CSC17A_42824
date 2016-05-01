@@ -1,9 +1,0 @@
-Initials     Difficulty             Strikes      Hits     Ratio      Time(sec)
-      DM           Easy                  13         1        13        58
-      DM           Easy                   0         0       nan         8
-      DM           Easy                   0         0       nan        11
-      DM           Hard                   2         1         2        12
-      DM           Hard                   4         0       inf        35
-      DM         Medium                   9         6       1.5        58
-      DM         Medium                   3         0       inf        16
-      dm           Easy                   5         0       inf        14

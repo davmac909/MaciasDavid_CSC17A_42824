@@ -19,13 +19,13 @@ const short NSIZE = 3;
 struct Player{
     
     char intls[NSIZE];
-    short inCol, inRow, totHit, totMiss, nbombs;
+    short time, inCol, inRow, totHit, totMiss, nbombs;
     bool bomb;
-    float time, ratio;
+    float ratio;
     Player(){
         totHit = 0;
         totMiss = 0;
-        nbombs = 3;
+        nbombs = 5;
         bomb = false;
     }
     
