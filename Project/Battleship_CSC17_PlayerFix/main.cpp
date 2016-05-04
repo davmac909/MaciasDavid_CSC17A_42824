@@ -187,7 +187,8 @@ void prntScrn(Grid *a, Ship *s, short n, Player &p){
             cout <<" Enemy Ships:";
         }if(i > 1){
             if(i < 7){
-                cout <<" Ship: " <<i-1 <<"; " <<s[i-2].shipLtemp <<" Hits needed";
+                cout <<" Ship " <<i-1 <<": " <<s[i-2].shipLtemp <<"/" 
+                        <<s[i-2].shipL <<" Hits needed";
             }
         }if(i == 8){
             cout <<" Legend:";
@@ -209,11 +210,12 @@ void getInpt(Player &p, bool &i, bool &end){
     char a,b;
     do{
         if(i){
-            cout <<"Welcome Green Horn!" <<endl;
-            cout <<"Enter the letter and number you wish to strike " <<endl;
-            cout <<"Then 'B' to order a bomb strike if desired." <<endl;
-            cout <<"i.e. \"H9\" for a missile or \"H9B\" for a bomb" <<endl;
-            cout <<"Or enter 'Q' to quit the game" <<endl;
+            cout <<"Welcome to BATTLESHIP Green Horn!" <<endl;
+            cout <<"Instructions:" <<endl;
+            cout <<"    Enter the letter and number you wish to strike " <<endl;
+            cout <<"    Then 'B' to order a bomb strike if desired." <<endl;
+            cout <<"    i.e. \"H9\" for a missile or \"H9B\" for a bomb" <<endl;
+            cout <<"    Or enter 'Q' to quit the game" <<endl;
             
         }else{
             cout <<"What's your next target?" <<endl;
@@ -290,13 +292,14 @@ void hitMiss(Grid *g, Ship *s, Player &p, short n){
 void getIntl(Player &p){
     ofstream out;
     out.open("scores.dat",ios::binary | ios::app);
+    cout <<endl;
     cout <<"Game End:" <<endl;
-    cout <<" Game Time(sec) - " <<p.time <<endl;
-    cout <<" Bombs Remaining - " <<p.nbombs <<endl;
-    cout <<" Hits - " <<p.totHit <<endl;
-    cout <<" Misses - " <<p.totMiss <<endl;
-    cout <<" Hits per strikes called - " <<p.ratio <<endl;
-    cout <<" Your Initials: ";
+    cout <<"    Game Time(sec) - " <<p.time <<endl;
+    cout <<"    Bombs Remaining - " <<p.nbombs <<endl;
+    cout <<"    Hits - " <<p.totHit <<endl;
+    cout <<"    Misses - " <<p.totMiss <<endl;
+    cout <<"    Hits per strikes called - " <<p.ratio <<endl;
+    cout <<"    Your Initials: ";
     cin.getline(p.intls, NSIZE);
     
     //Write player information to file in binary
