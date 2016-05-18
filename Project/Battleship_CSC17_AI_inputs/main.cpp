@@ -11,8 +11,6 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
-#include "Grid.h"
-#include "Ship.h"
 #include "Player.h"
 using namespace std;
 
@@ -21,14 +19,17 @@ using namespace std;
 //Global Constants
 
 //Function Prototypes
-Ship *shpLoc(short);
-Grid *drwGrid(Ship *, short, short);
-void prntScrn(Grid *, Ship *, short, Player &);
+Ship *shpLoc(Player);
+Grid *drwGrid(Player &);
+void prntScrn(Player &, Player &);
 void getInpt(Player &, bool &, bool &);
 void hitMiss(Grid *, Ship *, Player &, short);
 void getIntl(Player &);
 void shwRank(Player &);
-void gmEnd(Ship *, short , bool &);
+void gmEnd(Player, Player, bool &);
+bool dspMenu();
+void mkShpG(Player &, Player);
+void cmpInpt(Player &, Player);
 
 //Execution Begins Here
 int main(int argc, char** argv) {
@@ -36,11 +37,29 @@ int main(int argc, char** argv) {
     srand(static_cast<int>(time(0)));
     
     //Declare and initialize variables
-    short nShips = 5;
-    short nGrids = 2;
-    Player player;
-    Ship *ship = shpLoc(nShips);
-    Grid *grid = drwGrid(ship, nShips, nGrids);
+    Player user;
+    Player comp;
+    user.orgn = dspMenu();
+    user.nGrids = 2;
+    user.shipG = 0;
+    user.dispG = 1;
+    comp.nGrids = 2;
+    comp.dispG = 0;
+    comp.shipG = 1;
+    comp.ship = shpLoc(comp);
+    comp.grid = drwGrid(comp);
+    if(user.orgn){
+        mkShpG(user, comp);
+        user.strt = true;
+    }else{
+        user.strt = true;
+        user.ship = shpLoc(user);
+        user.grid = drwGrid(user);
+    }
+    
+    cout <<endl <<endl <<setw(60) <<"GAME ON!" <<endl;
+    prntScrn(user, comp);
+    /*
     bool gameEnd = false;
     bool intl = true;
     clock_t tStrt, tEnd; //Start time and End time
@@ -48,9 +67,9 @@ int main(int argc, char** argv) {
     tStrt = time(0);
     do{
         //Print Game Screen
-        prntScrn(grid, ship, nShips, player);
+        prntScrn(user, comp);
         //Determine game end
-        gmEnd(ship, nShips, gameEnd);
+        gmEnd(user, comp, gameEnd);
         if(gameEnd){
             break;
         }
@@ -79,14 +98,19 @@ int main(int argc, char** argv) {
     }
     delete []ship;
     delete []grid;
+     * 
+     * 
+     * */
     //Exit stage right
     return 0;
 }
 
-Ship *shpLoc(short n){
-    Ship *a = new Ship[n];
+
+
+Ship *shpLoc(Player p){
+    Ship *a = new Ship[p.nShips];
     
-    for(int i = 0; i < n; i++){
+    for(int i = 0; i < p.nShips; i++){
         switch(i){
             case 0:{
                 a[i].shipL = 5;
@@ -112,55 +136,57 @@ Ship *shpLoc(short n){
     return a;
 }
 
-Grid *drwGrid(Ship *b, short n, short g){
-    Grid *a = new Grid[g];
+Grid *drwGrid(Player &p){
+    Grid *a = new Grid[p.nGrids];
     
-    for(int i = 0; i < n; i++){
-        b[i].crdnts = new Location[b[i].shipL];
+    for(int i = 0; i < p.nShips; i++){
+        p.ship[i].crdnts = new Location[p.ship[i].shipL];
     }
     short ortn;
-    for(int h = 0; h < g; h++){
+    for(int h = 0; h < p.nGrids; h++){
         for(int i = 0; i < ROW; i++){
             for(int j = 0; j < COL; j++){ 
                a[h].grid[i][j] = '~';
             }
         }
     }
-    for(int s = 0; s < n; s++){
+    for(int s = 0; s < p.nShips; s++){
         for(int i = 0; i < ROW; i++){
             for(int j = 0; j < COL; j++){
-                if(j == b[s].shipX-1 && i == b[s].shipY-1){
-                    ortn = rand()%2;         //0 = horizontal, 1 = vertical
-                    if(ortn == 1){ 
-                        if(a[1].grid[i][j] == 'O'){
+                if(j == p.ship[s].shipX-1 && i == p.ship[s].shipY-1){
+                    if(!p.orgn){
+                        p.ship[s].ortn = rand()%2;         //0 = horizontal, 1 = vertical
+                    }
+                    if(p.ship[s].ortn == 1){ 
+                        if(a[p.shipG].grid[i][j] == 'O'){
                             do{
                                 j++;
-                            }while(a[1].grid[i][j] == 'O');
+                            }while(a[p.shipG].grid[i][j] == 'O');
                         }
-                        while(i < b[s].shipY+b[s].shipL-1){
+                        while(i < p.ship[s].shipY+p.ship[s].shipL-1){
                             short t = i;
-                            for(int v = 0; v < b[s].shipL; v++){
-                                b[s].crdnts[v].xLoc = j;
-                                b[s].crdnts[v].yLoc = t;
+                            for(int v = 0; v < p.ship[s].shipL; v++){
+                                p.ship[s].crdnts[v].xLoc = j;
+                                p.ship[s].crdnts[v].yLoc = t;
                                 t--;
                             }
-                            a[1].grid[i][j] = 'O';
+                            a[p.shipG].grid[i][j] = 'O';
                             i++;
                         }
                     }else{
-                        if(a[1].grid[i][j] == 'O'){
+                        if(a[p.shipG].grid[i][j] == 'O'){
                             do{
                                 i++;
-                            }while(a[1].grid[i][j] == 'O');
+                            }while(a[p.shipG].grid[i][j] == 'O');
                         }
-                        while(j < b[s].shipX+b[s].shipL-1){
+                        while(j < p.ship[s].shipX+p.ship[s].shipL-1){
                             short t = j;
-                            for(int v = 0; v < b[s].shipL; v++){
-                                b[s].crdnts[v].xLoc = t;
-                                b[s].crdnts[v].yLoc = i;
+                            for(int v = 0; v < p.ship[s].shipL; v++){
+                                p.ship[s].crdnts[v].xLoc = t;
+                                p.ship[s].crdnts[v].yLoc = i;
                                 t--;
                             }
-                            a[1].grid[i][j] = 'O';
+                            a[p.shipG].grid[i][j] = 'O';
                             j++;
                         }
                     }
@@ -171,37 +197,90 @@ Grid *drwGrid(Ship *b, short n, short g){
     return a;
 }
 
-void prntScrn(Grid *a, Ship *s, short n, Player &p){
+void prntScrn(Player &p, Player &c){
+    cout <<setw(22) <<"YOUR BOARD" <<setw(77) <<"ENEMY'S BOARD" <<endl;
     cout <<"  ";
     for(int i = 65, j = 0; j < COL; j++, i++){
             cout <<" " <<static_cast<char>(i);       //Print Letters for Columns
         }
+    if(p.strt){
+        cout <<setw(45);
+        for(int i = 65, j = 0; j < COL; j++, i++){
+                cout <<" " <<static_cast<char>(i);       //Print Letters for Columns
+            }
+    }
+    
     cout <<endl;
     for(int i = 0; i < ROW; i++){
         cout <<setw(2) <<i+1; //Numbers for rows
         for(int j = 0; j < COL; j++){
-            cout <<" " <<a[0].grid[i][j];
+            cout <<" " <<p.grid[p.shipG].grid[i][j];
         }
-        if(i == 1){
-            cout <<" Enemy Ships:";
-        }if(i > 1){
-            if(i < 7){
-                cout <<" Ship " <<i-1 <<": " <<s[i-2].shipLtemp <<"/" 
-                        <<s[i-2].shipL <<" Hits needed";
+        if(p.strt){
+            if(i == 1){
+            cout <<" Your Ships:";
+            }if(i > 1){
+                if(i < 7){
+                    cout <<" Ship " <<i-1 <<": " <<p.ship[i-2].shipLtemp <<"/" 
+                            <<p.ship[i-2].shipL <<" Hits Remaining";
+                }
+            }if(i == 8){
+                cout <<" Legend:";
+            }if(i == 9){
+                cout <<" 'H'-Hit, 'X'-Miss";
+            }if(i == 11){
+                cout <<" Bombs Remaining: " <<p.nbombs;
+            }if(i == 12){
+                cout <<" Total Hits: " <<p.totHit;
+            }if(i == 13){
+                cout <<" Total Misses: " <<p.totMiss;
             }
-        }if(i == 8){
-            cout <<" Legend:";
-        }if(i == 9){
-            cout <<" 'H'-Hit, 'X'-Miss";
-        }if(i == 11){
-            cout <<" Bombs Remaining: " <<p.nbombs;
-        }if(i == 12){
-            cout <<" Total Hits: " <<p.totHit;
-        }if(i == 13){
-            cout <<" Total Misses: " <<p.totMiss;
+            //////////////////////////COMP GRID///////////////////////////
+            if(i == 0 || i == 7 || i == 10 || i == 14){
+                cout <<setw(44);
+            }
+            if(i == 1){
+                cout <<setw(32);
+            }if(i > 1){
+                if(i < 7){
+                    cout <<setw(17);
+                }
+            }if(i == 8){
+                cout <<setw(36);
+            }if(i == 9){
+                cout <<setw(26);
+            }if(i == 11){
+                cout <<setw(25);
+            }if(i == 12){
+                cout <<setw(30);
+            }if(i == 13){
+                cout <<setw(28);
+            }
+
+            cout <<i+1; //Numbers for rows
+            for(int j = 0; j < COL; j++){
+                cout <<" " <<c.grid[c.dispG].grid[i][j];
+            }
+            if(i == 1){
+                cout <<" Enemy's Ships:";
+            }if(i > 1){
+                if(i < 7){
+                    cout <<" Ship " <<i-1 <<": " <<c.ship[i-2].shipLtemp <<"/" 
+                            <<c.ship[i-2].shipL <<" Hits Remaining";
+                }
+            }if(i == 10){
+                cout <<" Enemy's:";
+            }if(i == 11){
+                cout <<" Bombs Remaining: " <<c.nbombs;
+            }if(i == 12){
+                cout <<" Total Hits: " <<c.totHit;
+            }if(i == 13){
+                cout <<" Total Misses: " <<c.totMiss;
+            }
         }
         cout <<endl;
     }
+    
 }
 
 void getInpt(Player &p, bool &i, bool &end){
@@ -209,7 +288,6 @@ void getInpt(Player &p, bool &i, bool &end){
     char a,b;
     do{
         if(i){
-            cout <<"Welcome to BATTLESHIP Green Horn!" <<endl;
             cout <<"Instructions:" <<endl;
             cout <<"    Enter the letter and number you wish to strike " <<endl;
             cout <<"    Then 'B' to order a bomb strike if desired." <<endl;
@@ -329,12 +407,94 @@ void shwRank(Player &p){
     in.close();
 }
 
-void gmEnd(Ship *s, short n, bool &b){
-    short temp;
-    for(int i = 0; i < n; i++){
-        temp += s[i].shipLtemp;
-        if(temp == 0){
+void gmEnd(Player p, Player c, bool &b){
+    short temp1 = 0, temp2 = 0;
+    for(int i = 0; i < p.nShips; i++){
+        temp1 += p.ship[i].shipLtemp;
+        temp2 += c.ship[i].shipLtemp;
+        if(temp1 == 0 || temp2 == 0){
             b = true;
+        }
+    }
+}
+
+bool dspMenu(){
+    short opt;
+    bool a;
+    do{
+    cout <<setw(27) <<"BATTLESHIP" <<endl <<endl;
+    cout <<"Enter the number that corresponds to the option you choose:" <<endl;
+    cout <<"    1) Let me place my ships myself" <<endl;
+    cout <<"    2) Place and orient my ships automatically" <<endl;
+    cin >>opt;
+    }while(!(opt == 1 || opt == 2));
+    if(opt == 1){
+        return a = true;
+    }else{
+        return a = false;
+    }
+}
+
+void mkShpG(Player &p, Player c){
+    p.ship = new Ship[p.nShips];
+    
+    for(int i = 0; i < p.nShips; i++){
+        switch(i){
+            case 0:{
+                p.ship[i].shipL = 5;
+                break;
+            }case 1:{
+                p.ship[i].shipL = 4;
+                break;
+            }case 2:{
+                p.ship[i].shipL = 3;
+                break;
+            }case 3:{
+                p.ship[i].shipL = 3;
+                break;
+            }case 4:{
+                p.ship[i].shipL = 2;
+                break;
+            }
+        }
+    }
+    string in;
+    char d;
+    for(int i = 0; i < p.nShips; i++){
+        cin.ignore();
+        p.ship[i].shipLtemp = p.ship[i].shipL;
+        prntScrn(p, c);
+        cout <<"Enter the column letter followed by the row number in the above table to place the" <<endl; 
+        cout <<"initial character of ship " <<i+1 <<" which is of ";
+        cout <<p.ship[i].shipL <<" characters." <<endl;
+
+        getline(cin, in);
+
+        stringstream ss(in);
+        ss >>d >> p.ship[i].shipY;
+
+        d = toupper(d);
+        p.ship[i].shipX = static_cast<int>(d-65)+1;
+        do{
+            cout <<"Now enter a '0' to orient the ship horizontally or a '1' to orient the ship vertically." <<endl;
+            cin >>p.ship[i].ortn;
+        }while(!(p.ship[i].ortn == 0 || p.ship[i].ortn == 1));
+        p.grid = drwGrid(p);
+    }
+    
+}
+
+void cmpInpt(Player &c, Player p){
+    short pRow, pCol, shp, shpL;
+    for(int i = 0; i < ROW; i++){
+        for(int j = 0; j < COL; j++){
+            if(p.grid[p.dispG].grid[i][j] == 'H'){
+                pRow = i;
+                pCol = j;
+                if(){
+                    
+                }
+            }
         }
     }
 }

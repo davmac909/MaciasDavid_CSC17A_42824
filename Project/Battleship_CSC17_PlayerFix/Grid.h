@@ -18,9 +18,6 @@ const signed short COL = 15;
 
 struct Grid{
     char grid[ROW][COL];
-    Grid(){
-        grid[ROW][COL] = {};
-    }
 };
 
 
